@@ -3,6 +3,9 @@
 #Train Skills:  Train: Dmg, Rest: Health, Forge: Armor, Run: stamina
 #player has base stats that increase with each choice on the day
 
+## Test Test Test
+
+
 import random
 
 #SWORD_TRAINING = 5
