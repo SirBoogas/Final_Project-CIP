@@ -1,0 +1,263 @@
+#display stats, level and day
+#ask what they want to do with their knight
+#Train Skills:  Train: Dmg, Rest: Health, Forge: Armor, Run: stamina
+#player has base stats that increase with each choice on the day
+
+import random
+
+#SWORD_TRAINING = 5
+#VIGOR = 10
+#FORGE = 5
+#RUN =  3
+
+
+BASE_DMG = 10
+BASE_HEALTH = 30
+BASE_ARMOR = 10
+BASE_STAMINA = 10
+
+# Level up values
+damage_lvls = 0
+health_lvls = 0
+armor_lvls = 0
+stamina_lvls = 0
+
+player_stats = {
+    "player_damage" : BASE_DMG + damage_lvls,
+    "player_health" : BASE_HEALTH + health_lvls,
+    "player_armor" : BASE_ARMOR + armor_lvls,
+    "player_stamina" : BASE_STAMINA + stamina_lvls
+}
+   
+# Enemy Stats
+boss = {
+    "boss_damage": 30,
+    "boss_health": 150,
+    "boss_armor": 30,
+    "boss_stamina": 5
+}
+
+knight = {
+    "knight_damage": 10,
+    "knight_health": 30,
+    "knight_armor": 10,
+    "knight_stamina": 5
+}
+
+goblin = {
+    "goblin_damage": 8,
+    "goblin_health": 15,
+    "goblin_armor": 5,
+    "goblin_stamina": 20
+}
+
+wizard = {
+    "wizard_damage": 18,
+    "wizard_health": 20,
+    "wizard_armor": 5,
+    "wizard_stamina": 4
+}
+
+golem = {
+    "golem_damage": 6,
+    "golem_health": 50,
+    "golem_armor": 10,
+    "golem_stamina": 5
+}
+
+dragon = {
+    "dragon_damage": 20,
+    "dragon_health": 60,
+    "dragon_armor": 10,
+    "dragon_stamina": 10
+}
+
+enemy_order = ["goblin", "wizard", "knight", "golem", "dragon"]
+
+enemy_stats = {
+    "goblin": goblin,
+    "wizard": wizard,
+    "knight": knight,
+    "golem": golem,
+    "dragon": dragon,
+    "boss": boss
+}
+
+
+
+
+def camp(enemy_name):
+    global damage_lvls, health_lvls, armor_lvls, stamina_lvls
+    
+    print("You've arrived at basecamp.")
+
+    #ask player what option they want to train in.
+    print("There is time to train before your next battle.")
+    choice = input("What do you train? \n1. Sword training, 2. Vigor, 3. Armor or 4.Stamina?\n")
+    if (choice == "1"):
+        damage_lvls += 5
+        print("You've increased your damage!\n")
+        
+    elif (choice == "2"):
+        health_lvls += 10
+        print("You've increased your vigor!\n")
+        
+    elif (choice == "3"):
+        armor_lvls += 5
+        print("You've reinforced your armor!\n")
+        
+    elif (choice == "4"):
+        stamina_lvls += 3
+        print("You've increased your stamina!\n")
+        
+    else: 
+        print("Invalid choice")
+        camp(enemy_name)
+
+    global player_stats
+    player_stats = update_player_stats()
+    print("Current stats:")
+    print("Damage: ", player_stats["player_damage"])
+    print("Health: ", player_stats["player_health"])
+    print("Armor: ", player_stats["player_armor"])
+    print("Stamina: ", player_stats["player_stamina"])
+
+    return
+   
+  
+   #move to battle function
+
+
+def battle(enemy_name):
+    global player_stats
+    enemy = enemy_stats[enemy_name].copy()
+   
+    
+
+    print(f"You're fighting a {enemy_name.upper()}!")
+
+    print("Player strikes first!")
+  
+    while enemy[f"{enemy_name}_health"] > 0 and player_stats["player_health"] > 0:
+        print("NEXT ROUND!")
+        print(f"{enemy_name.title()} Health: {enemy[f'{enemy_name}_health']} | Your Health: {player_stats['player_health']}")
+
+        player_blocking = False
+        
+
+        while True:
+            try:
+                print("Your stamina: ", player_stats["player_stamina"])
+                player_battle_choice = int(input("1. Attack (cost: 3 stamina) 2. Block(+1 stamina) 3. Rest (+3 stamina)\n"))
+                if player_battle_choice == 1 and player_stats["player_stamina"] >= 3:
+                    player_stats["player_stamina"] -= 2
+                    break
+                elif player_battle_choice == 2 and player_stats["player_stamina"] >= 1:
+                    player_stats["player_stamina"] += 1
+                    break
+                elif player_battle_choice == 3:
+                    player_stats["player_stamina"] += 3
+                    break
+                else:
+                    print("You dont have enough stamina for that.")
+            except ValueError:
+                    print("Enter a valid number.")
+                    
+        
+        if (player_battle_choice == 1):
+
+            print("You attack!")
+            enemy_move = random.randint(1, 2)
+            if enemy_move == 2:
+                print(f"{enemy_name.upper()} blocks your attack!\n")
+            else:
+                enemy[f"{enemy_name}_health"] -= player_stats["player_damage"]
+                print(f"You dealt damage! Enemy health: ", enemy[f"{enemy_name}_health"])
+        else:
+            print("You raise your shield for the incoming attack!\n")
+            player_blocking = True
+
+    #Enemy Turn
+
+        enemy_turn = random.randint(1, 2)
+        if (enemy_turn == 1):
+            print(f"{enemy_name.title()} attacks!")
+            dodge = random.randint(1, 100)
+            if dodge <= player_stats["player_stamina"] * 2:
+                print("You dodged the attack!\n")
+            else:   
+                enemy_dmg = enemy[f"{enemy_name}_damage"]
+                reduced_damage = enemy_dmg * (1 - player_stats["player_armor"] / 100)
+
+                if player_blocking:
+                    reduced_damage *= 0.8
+
+                player_stats["player_health"] -= int(reduced_damage)
+                print(f"You were hit! Your health: {player_stats["player_health"]}\n")
+        else:
+            print(f"{enemy_name.title()} raises their defenses.\n")
+        
+    
+    if (player_stats["player_health"] <= 0):
+        print("You have fallen in battle...")
+        return False
+    else:
+        print(f"VICTORY! You have slain the {enemy_name.upper()}!")
+        input("Press enter to return to camp.")
+        return True
+    
+    
+    
+
+def pre_battle(enemy_name):
+    while True:
+        next_battle = input("Are you ready for your next battle? (Y/N)\n").upper()
+        if (next_battle.upper() == "Y"):
+            return True
+        elif (next_battle.upper() == "N"):
+            print("They give up so easy.")
+            return False
+            
+        else:
+            print("What does that mean?")
+            pre_battle(enemy_name)
+
+
+
+def update_player_stats():
+    return {
+        "player_damage" : BASE_DMG + damage_lvls,
+        "player_health" : BASE_HEALTH + health_lvls,
+        "player_armor" : BASE_ARMOR + armor_lvls,
+        "player_stamina" : BASE_STAMINA + stamina_lvls
+    }
+
+def boss_battle():
+    battle()
+   
+def start_game():
+    for round_num in range(len(enemy_order)):
+        enemy_name = enemy_order[round_num]
+        print(f"\n--- ROUND {round_num + 1}: You face a {enemy_name.upper()}! ---")
+        
+        player_stats["player_health"] = BASE_HEALTH + health_lvls
+        
+        camp(enemy_name)
+        if not pre_battle(enemy_name):
+            print("You refused to fight. Game Over.")
+            return
+        
+        survived = battle(enemy_name)
+        if not survived:
+            print("You died in battle. Game Over.")
+            return
+        
+
+    print("You have defeated all enemies! The land is safe once more.")
+
+    camp()
+
+
+
+
+start_game()
