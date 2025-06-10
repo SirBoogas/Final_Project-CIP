@@ -1,17 +1,7 @@
-#display stats, level and day
-#ask what they want to do with their knight
-#Train Skills:  Train: Dmg, Rest: Health, Forge: Armor, Run: stamina
-#player has base stats that increase with each choice on the day
-
-## Test Test Test
-
 
 import random
+import time
 
-#SWORD_TRAINING = 5
-#VIGOR = 10
-#FORGE = 5
-#RUN =  3
 
 
 BASE_DMG = 10
@@ -34,7 +24,7 @@ player_stats = {
    
 # Enemy Stats
 boss = {
-    "boss_damage": 25,
+    "boss_damage": 20,
     "boss_health": 200,
     "boss_armor": 30,
     "boss_stamina": 5
@@ -62,7 +52,7 @@ wizard = {
 }
 
 golem = {
-    "golem_damage": 6,
+    "golem_damage": 10,
     "golem_health": 50,
     "golem_armor": 10,
     "golem_stamina": 5
@@ -93,6 +83,7 @@ def camp(enemy_name):
     global damage_lvls, health_lvls, armor_lvls, stamina_lvls
     
     print("You've arrived at basecamp.")
+    time.sleep(3)
 
     #ask player what option they want to train in.
     print("There is time to train before your next battle.")
@@ -124,7 +115,7 @@ def camp(enemy_name):
     print("Health: ", player_stats["player_health"])
     print("Armor: ", player_stats["player_armor"])
     print("Stamina: ", player_stats["player_stamina"])
-
+    time.sleep(3)
     return
    
   
@@ -138,8 +129,9 @@ def battle(enemy_name):
     
 
     print(f"You're fighting a {enemy_name.upper()}!")
-
+    time.sleep(3)
     print("Player strikes first!")
+    time.sleep(3)
   
     while enemy[f"{enemy_name}_health"] > 0 and player_stats["player_health"] > 0:
         print("NEXT ROUND!")
@@ -151,7 +143,7 @@ def battle(enemy_name):
         while True:
             try:
                 print("Your stamina: ", player_stats["player_stamina"])
-                player_battle_choice = int(input("1. Attack (cost: 3 stamina) 2. Block(+1 stamina) 3. Rest (+3 stamina) 4. Heal (+15 Vigor)\n"))
+                player_battle_choice = int(input("1. Attack (cost: 3 stamina) 2. Block (+1 stamina) 3. Rest (+3 stamina) 4. Heal (+25 Vigor)\n"))
                 if player_battle_choice == 1 and player_stats["player_stamina"] >= 3:
                     player_stats["player_stamina"] -= 3
                     break
@@ -162,7 +154,13 @@ def battle(enemy_name):
                     player_stats["player_stamina"] += 3
                     break
                 elif player_battle_choice == 4:
-                    player_stats["player_health"] += 15
+
+                    player_stats["player_health"] += 25
+                    max_health = BASE_HEALTH + health_lvls
+                    if player_stats["player_health"] > max_health:
+                        player_stats["player_health"] = max_health
+                    break
+                    
                 else:
                     print("You dont have enough stamina for that.")
             except ValueError:
@@ -183,6 +181,7 @@ def battle(enemy_name):
             player_blocking = True
 
     #Enemy Turn
+        time.sleep(3)
 
         enemy_turn = random.randint(1, 2)
         if (enemy_turn == 1):
@@ -204,9 +203,11 @@ def battle(enemy_name):
         
     
     if (player_stats["player_health"] <= 0):
+        time.sleep(3)
         print("You have fallen in battle...")
         return False
     else:
+        time.sleep(3)
         print(f"VICTORY! You have slain the {enemy_name.upper()}!")
         input("Press enter to return to camp.")
         return True
@@ -239,12 +240,27 @@ def update_player_stats():
 
 def boss_battle():
     global player_stats
+    global damage_lvls, health_lvls, armor_lvls, stamina_lvls
+    damage_lvls += 5
+    health_lvls += 20
+    armor_lvls += 10
+    stamina_lvls += 5
+    
     enemy = enemy_stats["boss"].copy()
+
+
     print("You've done it. These lands are safe for you and your people, now go. Speak with the king, as your ceremony awaits.")
+    time.sleep(4)
     print("You stand in the castle walls, waiting for ceremony of victory. Listening to the cheers of the crowds outside the gate.")
+    time.sleep(4)
     print("Suddenly! The cheers retreat into screams!")
+    time.sleep(2)
     print("You run outside to see a Knight. Identical to yourself. They go to speak 'Ive heard of your might brother, now offer me an honorable fight' ")
+    time.sleep(5)
     print("'Lets do it!'")
+    time.sleep(3)
+
+
     
 
     print(f"You're now fighting the FINAL BOSS!")
@@ -262,7 +278,7 @@ def boss_battle():
         while True:
             try:
                 print("Your stamina: ", player_stats["player_stamina"])
-                player_battle_choice = int(input("1. Attack (cost: 3 stamina) 2. Block(+1 stamina) 3. Rest (+3 stamina) 4. Heal (+15 Vigor) \n"))
+                player_battle_choice = int(input("1. Attack (cost: 3 stamina) 2. Block(+1 stamina) 3. Rest (+3 stamina) 4. Heal (+25 Vigor) \n"))
                 if player_battle_choice == 1 and player_stats["player_stamina"] >= 3:
                     player_stats["player_stamina"] -= 3
                     break
@@ -273,10 +289,9 @@ def boss_battle():
                     player_stats["player_stamina"] += 3
                     break
                 elif player_battle_choice == 4:
-                    player_stats["player_health"] += 15
-                    break
+                    player_stats["player_health"] += 25
                     
-                    # Prevent overhealing
+                     # Prevent overhealing
                     max_health = BASE_HEALTH + health_lvls
                     if player_stats["player_health"] > max_health:
                         player_stats["player_health"] = max_health
@@ -302,6 +317,7 @@ def boss_battle():
             player_blocking = True
 
     #Enemy Turn
+        time.sleep(3)
 
         enemy_turn = random.randint(1, 4)
         if (enemy_turn == 1):
