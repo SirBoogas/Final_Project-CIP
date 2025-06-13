@@ -355,11 +355,11 @@ def boss_battle():
         #Stage 2
         if enemy["boss_health"] <= 150:
             print("You've Damaged his armor, he will take more damage now!")
-            enemy["boss_armor"] = enemy["boss_armor"] // 2
+            enemy["boss_armor"] -= 1
         #Stage 3
         if enemy["boss_health"] <= 75:
             print("He is struggling to keep up with your might. But is in a rage dealing more damage!")
-            enemy["boss_damage"] += 10
+            enemy["boss_damage"] -= 1
         
     
     if (player_stats["player_health"] <= 0):
